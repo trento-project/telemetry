@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -22,6 +23,19 @@ type HostTelemetry struct {
 	TotalMemoryMB int       `json:"total_memory_mb"`
 	CloudProvider string    `json:"cloud_provider"`
 	Time          time.Time `json:"time"`
+}
+
+func pingHandler() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintf(w, "pong")
+		return
+	}
 }
 
 func hostTelemetryHandler(adapters ...StorageAdapter) func(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +67,7 @@ func hostTelemetryHandler(adapters ...StorageAdapter) func(w http.ResponseWriter
 func HandleRequests() {
 	influxDBAdapter := NewInfluxDB(os.Getenv("TELEMETRY_INFLUXDB_URL"), os.Getenv("TELEMETRY_INFLUXDB_TOKEN"))
 
+	http.HandleFunc("/api/ping", pingHandler())
 	http.HandleFunc("/api/collect/hosts", hostTelemetryHandler(influxDBAdapter))
 
 	log.Infof("Starting Trento telemetry server...")

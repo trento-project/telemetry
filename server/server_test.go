@@ -13,6 +13,32 @@ import (
 	mock "github.com/stretchr/testify/mock"
 )
 
+func TestPingHandler(t *testing.T) {
+	req, err := http.NewRequest("GET", "/api/ping", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rec := httptest.NewRecorder()
+	handler := http.HandlerFunc(pingHandler())
+	handler.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusOK, rec.Code)
+}
+
+func TestPingHandlerNotAllowed(t *testing.T) {
+	req, err := http.NewRequest("POST", "/api/ping", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	rec := httptest.NewRecorder()
+	handler := http.HandlerFunc(pingHandler())
+	handler.ServeHTTP(rec, req)
+
+	assert.Equal(t, http.StatusMethodNotAllowed, rec.Code)
+}
+
 func TestHostTelemetryHandler(t *testing.T) {
 	storageAdapterMock := new(MockStorageAdapter)
 	storageAdapterMock.On("StoreHostTelemetry", mock.Anything).Return(nil)
