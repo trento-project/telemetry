@@ -7,23 +7,23 @@ import (
 )
 
 const (
-	org                      = "trento"
-	bucket                   = "telemetry"
 	hostTelemetryMeasurement = "host_telemetry"
 )
 
 type InfluxDB struct {
-	url   string
-	token string
+	url    string
+	token  string
+	org    string
+	bucket string
 }
 
-func NewInfluxDB(url string, token string) *InfluxDB {
-	return &InfluxDB{url: url, token: token}
+func NewInfluxDB(url string, token string, org string, bucket string) *InfluxDB {
+	return &InfluxDB{url: url, token: token, org: org, bucket: bucket}
 }
 
 func (i *InfluxDB) StoreHostTelemetry(h *HostTelemetry) error {
 	client := i.getClient()
-	writeAPI := client.WriteAPIBlocking(org, bucket)
+	writeAPI := client.WriteAPIBlocking(i.org, i.bucket)
 	defer client.Close()
 
 	p := influxdb2.NewPointWithMeasurement(hostTelemetryMeasurement).

@@ -65,7 +65,11 @@ func hostTelemetryHandler(adapters ...StorageAdapter) func(w http.ResponseWriter
 }
 
 func HandleRequests() {
-	influxDBAdapter := NewInfluxDB(os.Getenv("TELEMETRY_INFLUXDB_URL"), os.Getenv("TELEMETRY_INFLUXDB_TOKEN"))
+	influxDBAdapter := NewInfluxDB(
+		os.Getenv("TELEMETRY_INFLUXDB_URL"),
+		os.Getenv("TELEMETRY_INFLUXDB_TOKEN"),
+		os.Getenv("TELEMETRY_INFLUXDB_ORG"),
+		os.Getenv("TELEMETRY_INFLUXDB_BUCKET"))
 
 	http.HandleFunc("/api/ping", pingHandler())
 	http.HandleFunc("/api/collect/hosts", hostTelemetryHandler(influxDBAdapter))
