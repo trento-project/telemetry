@@ -1,1 +1,5 @@
 /telemetry
+**/.terraform
+**/terraform.tfstate*
+**/.terraform.tfstate*
+**/terraform*.tfvars
