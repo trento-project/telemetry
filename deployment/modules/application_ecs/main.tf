@@ -198,6 +198,15 @@ resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attach
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_cloudwatch_log_group" "main" {
+  name = "/ecs/${var.name}-task-${var.environment}"
+
+  tags = {
+    Name        = "${var.name}-task-${var.environment}"
+    Environment = var.environment
+  }
+}
+
 resource "aws_ecs_task_definition" "main" {
   family                   = "${var.name}-task-${var.environment}"
   network_mode             = "awsvpc"
@@ -222,6 +231,14 @@ resource "aws_ecs_task_definition" "main" {
     { name = "TELEMETRY_INFLUXDB_ORG", value = var.influxdb_org },
     { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket }
    ]
+   logConfiguration = {
+     logDriver = "awslogs"
+     options = {
+       awslogs-group         = aws_cloudwatch_log_group.main.name
+       awslogs-stream-prefix = "ecs"
+       awslogs-region        = var.region
+     }
+   }
   }])
 
   tags = {
