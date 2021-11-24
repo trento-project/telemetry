@@ -12,7 +12,7 @@ import (
 
 //go:generate mockery --name=StorageAdapter --inpackage --filename=storage_adapter_mock.go
 type StorageAdapter interface {
-	StoreHostTelemetry(*HostTelemetry) error
+	StoreHostTelemetry([]*HostTelemetry) error
 }
 
 type HostTelemetry struct {
@@ -34,7 +34,6 @@ func pingHandler() func(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "pong")
-		return
 	}
 }
 
@@ -45,17 +44,20 @@ func hostTelemetryHandler(adapters ...StorageAdapter) func(w http.ResponseWriter
 			return
 		}
 
-		var hostTelemetry HostTelemetry
-		err := json.NewDecoder(r.Body).Decode(&hostTelemetry)
+		var hostTelemetryEntries []*HostTelemetry
+		err := json.NewDecoder(r.Body).Decode(&hostTelemetryEntries)
 		if err != nil {
 			log.Errorf("Error unmarshaling host telemetry: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		log.Debugf("Received new host telemetry data from agent: %s", hostTelemetry.AgentID)
+		for _, h := range hostTelemetryEntries {
+			log.Debugf("Received new host telemetry data: %+v", h)
+		}
+
 		for _, adapter := range adapters {
-			if err := adapter.StoreHostTelemetry(&hostTelemetry); err != nil {
+			if err := adapter.StoreHostTelemetry(hostTelemetryEntries); err != nil {
 				log.Errorf("Error storing host telemetry: %v", err)
 			}
 		}
