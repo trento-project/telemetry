@@ -12,17 +12,18 @@ import (
 
 //go:generate mockery --name=StorageAdapter --inpackage --filename=storage_adapter_mock.go
 type StorageAdapter interface {
-	StoreHostTelemetry(*HostTelemetry) error
+	StoreHostTelemetry([]*HostTelemetry) error
 }
 
 type HostTelemetry struct {
-	AgentID       string    `json:"agent_id"`
-	SLESVersion   string    `json:"sles_version"`
-	CPUCount      int       `json:"cpu_count"`
-	SocketCount   int       `json:"socket_count"`
-	TotalMemoryMB int       `json:"total_memory_mb"`
-	CloudProvider string    `json:"cloud_provider"`
-	Time          time.Time `json:"time"`
+	InstallationID string    `json:"installation_id"`
+	AgentID        string    `json:"agent_id"`
+	SLESVersion    string    `json:"sles_version"`
+	CPUCount       int       `json:"cpu_count"`
+	SocketCount    int       `json:"socket_count"`
+	TotalMemoryMB  int       `json:"total_memory_mb"`
+	CloudProvider  string    `json:"cloud_provider"`
+	Time           time.Time `json:"time"`
 }
 
 func pingHandler() func(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +35,6 @@ func pingHandler() func(w http.ResponseWriter, r *http.Request) {
 
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "pong")
-		return
 	}
 }
 
@@ -45,17 +45,20 @@ func hostTelemetryHandler(adapters ...StorageAdapter) func(w http.ResponseWriter
 			return
 		}
 
-		var hostTelemetry HostTelemetry
-		err := json.NewDecoder(r.Body).Decode(&hostTelemetry)
+		var hostTelemetryEntries []*HostTelemetry
+		err := json.NewDecoder(r.Body).Decode(&hostTelemetryEntries)
 		if err != nil {
 			log.Errorf("Error unmarshaling host telemetry: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
-		log.Debugf("Received new host telemetry data from agent: %s", hostTelemetry.AgentID)
+		for _, h := range hostTelemetryEntries {
+			log.Debugf("Received new host telemetry data: %+v", h)
+		}
+
 		for _, adapter := range adapters {
-			if err := adapter.StoreHostTelemetry(&hostTelemetry); err != nil {
+			if err := adapter.StoreHostTelemetry(hostTelemetryEntries); err != nil {
 				log.Errorf("Error storing host telemetry: %v", err)
 			}
 		}
