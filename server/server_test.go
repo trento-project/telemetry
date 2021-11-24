@@ -45,22 +45,24 @@ func TestHostTelemetryHandler(t *testing.T) {
 
 	body, _ := json.Marshal([]*HostTelemetry{
 		{
-			AgentID:       "agent_id",
-			SLESVersion:   "15.2",
-			CPUCount:      16,
-			SocketCount:   32,
-			TotalMemoryMB: 32000,
-			CloudProvider: "azure",
-			Time:          time.Now(),
+			InstallationID: "uuid1",
+			AgentID:        "agent_id",
+			SLESVersion:    "15.2",
+			CPUCount:       16,
+			SocketCount:    32,
+			TotalMemoryMB:  32000,
+			CloudProvider:  "azure",
+			Time:           time.Now(),
 		},
 		{
-			AgentID:       "agent_id",
-			SLESVersion:   "15.2",
-			CPUCount:      16,
-			SocketCount:   16,
-			TotalMemoryMB: 32000,
-			CloudProvider: "azure",
-			Time:          time.Now(),
+			InstallationID: "uuid2",
+			AgentID:        "agent_id",
+			SLESVersion:    "15.2",
+			CPUCount:       16,
+			SocketCount:    16,
+			TotalMemoryMB:  32000,
+			CloudProvider:  "azure",
+			Time:           time.Now(),
 		},
 	})
 	req, err := http.NewRequest("POST", "/api/collect/hosts", bytes.NewBuffer(body))

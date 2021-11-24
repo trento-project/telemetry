@@ -16,13 +16,14 @@ type StorageAdapter interface {
 }
 
 type HostTelemetry struct {
-	AgentID       string    `json:"agent_id"`
-	SLESVersion   string    `json:"sles_version"`
-	CPUCount      int       `json:"cpu_count"`
-	SocketCount   int       `json:"socket_count"`
-	TotalMemoryMB int       `json:"total_memory_mb"`
-	CloudProvider string    `json:"cloud_provider"`
-	Time          time.Time `json:"time"`
+	InstallationID string    `json:"installation_id"`
+	AgentID        string    `json:"agent_id"`
+	SLESVersion    string    `json:"sles_version"`
+	CPUCount       int       `json:"cpu_count"`
+	SocketCount    int       `json:"socket_count"`
+	TotalMemoryMB  int       `json:"total_memory_mb"`
+	CloudProvider  string    `json:"cloud_provider"`
+	Time           time.Time `json:"time"`
 }
 
 func pingHandler() func(w http.ResponseWriter, r *http.Request) {

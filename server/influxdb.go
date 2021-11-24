@@ -30,6 +30,7 @@ func (i *InfluxDB) StoreHostTelemetry(h []*HostTelemetry) error {
 	var err error
 	for _, t := range h {
 		p := influxdb2.NewPointWithMeasurement(hostTelemetryMeasurement).
+			AddTag("installation_id", t.InstallationID).
 			AddTag("agent_id", t.AgentID).
 			AddField("sles_version", t.SLESVersion).
 			AddField("cpu_count", t.CPUCount).
