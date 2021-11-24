@@ -34,6 +34,11 @@ test:
 vet-check:
 	go vet ./...
 
+.PHONY: fmt-check
+fmt-check:
+	gofmt -l .
+	[ "`gofmt -l .`" = "" ]
+
 .PHONY: generate
 generate:
 ifeq (, $(shell command -v mockery 2> /dev/null))
