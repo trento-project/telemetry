@@ -30,3 +30,18 @@ terraform init
 terraform apply
 ```
 4. When the deployment is completed the terraform output shows the `dns_name` which Trento should send the telemetry data
+
+## Development
+
+### Requirements
+
+1. [Docker](https://docs.docker.com/get-docker/)
+2. [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Environment configuration
+
+Start the platform infrastructure by running `make start`
+
+It spawns an `influx` instance and a `postgres` instance.
+
+Fill `.env` as needed and Leverage docker compose override features by `cp docker-compose.override.yaml.dist docker-compose.override.yaml` for customization.
