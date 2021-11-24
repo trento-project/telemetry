@@ -52,7 +52,7 @@ variable "environment" {
 variable "container_image" {
   type        = string
   description = "Deployed container name"
-  default     = "ghcr.io/trento-project/trento-telemetry"
+  default     = "ghcr.io/trento-project/telemetry"
 }
 
 variable "container_tag" {
