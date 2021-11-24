@@ -1,0 +1,16 @@
+version: "3.7"
+
+# Development environment override
+services:
+
+  influx:
+    ports:
+      - target: 8086
+        published: 8086
+        protocol: tcp
+  
+  database:
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
