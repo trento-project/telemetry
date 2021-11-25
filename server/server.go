@@ -60,6 +60,8 @@ func hostTelemetryHandler(adapters ...StorageAdapter) func(w http.ResponseWriter
 		for _, adapter := range adapters {
 			if err := adapter.StoreHostTelemetry(hostTelemetryEntries); err != nil {
 				log.Errorf("Error storing host telemetry: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
 			}
 		}
 
