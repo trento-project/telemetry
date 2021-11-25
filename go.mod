@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/influxdata/influxdb-client-go/v2 v2.5.1
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/vektra/mockery/v2 v2.9.4
@@ -20,7 +21,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.1.2 // indirect
 	github.com/pelletier/go-toml v1.2.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/zerolog v1.18.0 // indirect
 	github.com/spf13/afero v1.1.2 // indirect

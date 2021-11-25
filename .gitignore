@@ -3,3 +3,5 @@
 **/terraform.tfstate*
 **/.terraform.tfstate*
 **/terraform*.tfvars
+/docker-compose.override.yaml
+/.env

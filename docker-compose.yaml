@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+
+  influx:
+    image: influxdb:2.1-alpine
+    env_file:
+      - .env
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME:-telemetry}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD:-telemetry}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_INIT_ORG:-suse}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_INIT_BUCKET:-telemetry}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_INIT_ADMIN_TOKEN:-telemetry-token}
+    volumes:
+      - influx_data:/var/lib/influxdb2:rw
+    ports:
+      - target: 8086
+        published: 8086
+        protocol: tcp
+
+  database:
+    image: postgres:${POSTGRES_VERSION:-14}-alpine
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-telemetry}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_USER: ${POSTGRES_USER:-telemetry}
+    volumes:
+      - db_data:/var/lib/postgresql/data:rw
+      # you may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
+      # - ./docker/db/data:/var/lib/postgresql/data:rw.
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+
+volumes:
+  influx_data:
+  db_data:
