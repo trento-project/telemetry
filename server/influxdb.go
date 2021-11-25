@@ -4,7 +4,6 @@ import (
 	"context"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -27,7 +26,6 @@ func (i *InfluxDB) StoreHostTelemetry(h []*HostTelemetry) error {
 	writeAPI := client.WriteAPIBlocking(i.org, i.bucket)
 	defer client.Close()
 
-	var err error
 	for _, t := range h {
 		p := influxdb2.NewPointWithMeasurement(hostTelemetryMeasurement).
 			AddTag("installation_id", t.InstallationID).
@@ -39,12 +37,13 @@ func (i *InfluxDB) StoreHostTelemetry(h []*HostTelemetry) error {
 			AddField("cloud_provider", t.CloudProvider).
 			SetTime(t.Time)
 
-		e := writeAPI.WritePoint(context.Background(), p)
-		if e != nil {
-			errors.Wrap(err, e.Error())
+		err := writeAPI.WritePoint(context.Background(), p)
+		if err != nil {
+			return err
 		}
 	}
-	return err
+
+	return nil
 }
 
 func (i *InfluxDB) getClient() influxdb2.Client {
