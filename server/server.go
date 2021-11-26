@@ -4,11 +4,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
+
+func init() {
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
+	viper.SetEnvPrefix("TELEMETRY")
+	viper.AutomaticEnv()
+
+	viper.SetDefault("influxdb-org", "suse")
+	viper.SetDefault("influxdb-bucket", "telemetry")
+	viper.SetDefault("influxdb-url", "http://localhost:8086")
+	viper.SetDefault("influxdb-token", "telemetry-token")
+
+	viper.SetDefault("db-host", "localhost")
+	viper.SetDefault("db-port", 5432)
+	viper.SetDefault("db-user", "telemetry_user")
+	viper.SetDefault("db-password", "averystrongpassword")
+	viper.SetDefault("db-name", "telemetry")
+}
 
 //go:generate mockery --name=StorageAdapter --inpackage --filename=storage_adapter_mock.go
 type StorageAdapter interface {
@@ -71,13 +89,23 @@ func hostTelemetryHandler(adapters ...StorageAdapter) func(w http.ResponseWriter
 
 func HandleRequests() {
 	influxDBAdapter := NewInfluxDB(
-		os.Getenv("TELEMETRY_INFLUXDB_URL"),
-		os.Getenv("TELEMETRY_INFLUXDB_TOKEN"),
-		os.Getenv("TELEMETRY_INFLUXDB_ORG"),
-		os.Getenv("TELEMETRY_INFLUXDB_BUCKET"))
+		viper.GetString("influxdb-url"),
+		viper.GetString("influxdb-token"),
+		viper.GetString("influxdb-org"),
+		viper.GetString("influxdb-bucket"),
+	)
+	postgresAdapter := NewPostgres(
+		&PostgresConfig{
+			Host:     viper.GetString("db-host"),
+			Port:     viper.GetInt("db-port"),
+			User:     viper.GetString("db-user"),
+			Password: viper.GetString("db-password"),
+			DBName:   viper.GetString("db-name"),
+		},
+	)
 
 	http.HandleFunc("/api/ping", pingHandler())
-	http.HandleFunc("/api/collect/hosts", hostTelemetryHandler(influxDBAdapter))
+	http.HandleFunc("/api/collect/hosts", hostTelemetryHandler(influxDBAdapter, postgresAdapter))
 
 	log.Infof("Starting Trento telemetry server...")
 	log.Fatal(http.ListenAndServe(":10000", nil))
