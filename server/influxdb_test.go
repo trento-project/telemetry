@@ -8,14 +8,24 @@ import (
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/domain"
+	"github.com/spf13/viper"
 
 	"github.com/stretchr/testify/suite"
 )
+
+func init() {
+	viper.SetDefault("influxdb-org", "suse")
+	viper.SetDefault("influxdb-bucket", "test-bucket")
+	viper.SetDefault("influxdb-url", "http://localhost:8086")
+	viper.SetDefault("influxdb-token", "telemetry-token")
+}
 
 type InfluxDBTestSuite struct {
 	suite.Suite
 	influxDBAdapter *InfluxDB
 	client          influxdb2.Client
+	org             string
+	bucket          string
 }
 
 func TestInfluxDBTestSuite(t *testing.T) {
@@ -23,11 +33,13 @@ func TestInfluxDBTestSuite(t *testing.T) {
 }
 
 func (suite *InfluxDBTestSuite) SetupSuite() {
+	suite.org = viper.GetString("influxdb-org")
+	suite.bucket = viper.GetString("influxdb-bucket")
 	influxDBAdapter := NewInfluxDB(
-		"http://localhost:8086",
-		"my-super-secret-auth-token",
-		"test",
-		"test",
+		viper.GetString("influxdb-url"),
+		viper.GetString("influxdb-token"),
+		suite.org,
+		suite.bucket,
 	)
 
 	client := influxDBAdapter.getClient()
@@ -41,16 +53,16 @@ func (suite *InfluxDBTestSuite) TearDownSuite() {
 }
 
 func (suite *InfluxDBTestSuite) SetupTest() {
-	cleanUpInfluxDB(suite.client)
+	cleanUpInfluxDB(suite.client, suite.org, suite.bucket)
 }
 
 func (suite *InfluxDBTestSuite) TearDownTest() {
-	cleanUpInfluxDB(suite.client)
+	cleanUpInfluxDB(suite.client, suite.org, suite.bucket)
 }
 
-func cleanUpInfluxDB(client influxdb2.Client) {
+func cleanUpInfluxDB(client influxdb2.Client, org string, bucket string) {
 	deleteAPI := client.DeleteAPI()
-	deleteAPI.DeleteWithName(context.Background(), "test", "test", time.Now().Add(-240*time.Hour), time.Now(), "")
+	deleteAPI.DeleteWithName(context.Background(), org, bucket, time.Now().Add(-240*time.Hour), time.Now(), "")
 }
 
 func (suite *InfluxDBTestSuite) TestStoreHostTelemetry() {
@@ -78,12 +90,12 @@ func (suite *InfluxDBTestSuite) TestStoreHostTelemetry() {
 	})
 	suite.NoError(err)
 
-	queryAPI := suite.client.QueryAPI("test")
+	queryAPI := suite.client.QueryAPI(suite.org)
 
 	delimiter := ","
 	header := false
 	result, err := queryAPI.QueryRaw(context.Background(),
-		`from(bucket:"test")
+		`from(bucket:"`+suite.bucket+`")
 			|> range(start: -100000000h)
 			|> filter(fn: (r) => r._measurement == "host_telemetry")
 			|> filter(fn: (r) => r.agent_id == "agent_id_2")

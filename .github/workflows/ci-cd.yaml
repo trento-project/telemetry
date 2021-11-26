@@ -11,6 +11,18 @@ on:
     types: [published]
   workflow_dispatch:
 
+env:
+  TELEMETRY_INFLUXDB_URL: http://localhost:8086
+  TELEMETRY_INFLUXDB_TOKEN: my-super-secret-auth-token
+  TELEMETRY_INFLUXDB_ORG: test
+  TELEMETRY_INFLUXDB_BUCKET: test
+  
+  TELEMETRY_DB_HOST: localhost
+  TELEMETRY_DB_PORT: 5432
+  TELEMETRY_DB_USER: telemetry
+  TELEMETRY_DB_PASSWORD: telemetry
+  TELEMETRY_DB_NAME: telemetry
+
 jobs:
   test:
     runs-on: ubuntu-20.04
@@ -21,11 +33,19 @@ jobs:
           DOCKER_INFLUXDB_INIT_MODE: setup
           DOCKER_INFLUXDB_INIT_USERNAME: test
           DOCKER_INFLUXDB_INIT_PASSWORD: my-secret-password
-          DOCKER_INFLUXDB_INIT_ORG: test
-          DOCKER_INFLUXDB_INIT_BUCKET: test
-          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-super-secret-auth-token
+          DOCKER_INFLUXDB_INIT_ORG: ${{ env.TELEMETRY_INFLUXDB_ORG }}
+          DOCKER_INFLUXDB_INIT_BUCKET: ${{ env.TELEMETRY_INFLUXDB_BUCKET }}
+          DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${{ env.TELEMETRY_INFLUXDB_TOKEN }}
         ports:
           - 8086:8086
+      database:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_DB: ${{ env.TELEMETRY_DB_NAME }}
+          POSTGRES_PASSWORD: ${{ env.TELEMETRY_DB_PASSWORD }}
+          POSTGRES_USER: ${{ env.TELEMETRY_DB_USER }}
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2

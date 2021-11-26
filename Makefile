@@ -8,7 +8,6 @@ COLOR_COMMENT = \033[33m
 
 ## Help
 help:
-	
 	printf "${COLOR_COMMENT}Usage:${COLOR_RESET}\n"
 	printf "make [target]\n\nIf no target was provided, [default] is executed\n\n"
 	printf "${COLOR_COMMENT}Available targets:${COLOR_RESET}\n"

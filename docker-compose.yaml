@@ -8,28 +8,30 @@ services:
       - .env
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
-      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUXDB_INIT_USERNAME:-telemetry}
-      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUXDB_INIT_PASSWORD:-telemetry}
-      DOCKER_INFLUXDB_INIT_ORG: ${INFLUXDB_INIT_ORG:-suse}
-      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUXDB_INIT_BUCKET:-telemetry}
-      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUXDB_INIT_ADMIN_TOKEN:-telemetry-token}
+      DOCKER_INFLUXDB_INIT_USERNAME: ${TELEMETRY_INFLUXDB_USERNAME:-telemetry}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${TELEMETRY_INFLUXDB_PASSWORD:-telemetry}
+      DOCKER_INFLUXDB_INIT_ORG: ${TELEMETRY_INFLUXDB_ORG:-suse}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${TELEMETRY_INFLUXDB_BUCKET:-telemetry}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${TELEMETRY_INFLUXDB_TOKEN:-telemetry-token}
     volumes:
       - influx_data:/var/lib/influxdb2:rw
+      - ./docker/influx/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:rw
     ports:
       - target: 8086
         published: 8086
         protocol: tcp
 
   database:
-    image: postgres:${POSTGRES_VERSION:-14}-alpine
+    image: postgres:14-alpine
     env_file:
       - .env
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-telemetry}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
-      POSTGRES_USER: ${POSTGRES_USER:-telemetry}
+      POSTGRES_DB: ${TELEMETRY_DB_NAME:-telemetry}
+      POSTGRES_PASSWORD: ${TELEMETRY_DB_PASSWORD:-password}
+      POSTGRES_USER: ${TELEMETRY_DB_USER:-telemetry}
     volumes:
       - db_data:/var/lib/postgresql/data:rw
+      - ./docker/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:rw
       # you may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
       # - ./docker/db/data:/var/lib/postgresql/data:rw.
     ports:
