@@ -1,52 +1,10 @@
-provider "aws" {
-  region     = var.region
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
-}
-
-################################################################################
-# Network
-################################################################################
-
-data "aws_availability_zones" "available" {
-}
-
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 3.0"
-
-  name                 = var.name
-  cidr                 = "10.0.0.0/16"
-  azs                  = data.aws_availability_zones.available.names
-  private_subnets      = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets       = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
-  enable_nat_gateway   = true
-  single_nat_gateway   = true
-  enable_dns_hostnames = true
-
-  public_subnet_tags = {
-    Name        = "${var.name}-public-subnets-${var.environment}"
-    Environment = var.environment
-  }
-
-  private_subnet_tags = {
-    Name        = "${var.name}-private-subnets-${var.environment}"
-    Environment = var.environment
-  }
-
-  tags = {
-    Name        = "${var.name}-vpc-${var.environment}"
-    Environment = var.environment
-  }
-}
-
 ################################################################################
 # Security groups
 ################################################################################
 
 resource "aws_security_group" "alb" {
   name   = "${var.name}-sg-alb-${var.environment}"
-  vpc_id = module.vpc.vpc_id
+  vpc_id = var.vpc_id
 
   ingress {
     protocol         = "tcp"
@@ -72,7 +30,7 @@ resource "aws_security_group" "alb" {
 
 resource "aws_security_group" "ecs_tasks" {
   name   = "${var.name}-sg-task-${var.environment}"
-  vpc_id = module.vpc.vpc_id
+  vpc_id = var.vpc_id
 
   ingress {
     protocol         = "tcp"
@@ -105,7 +63,7 @@ resource "aws_lb" "main" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
-  subnets            = module.vpc.public_subnets
+  subnets            = var.public_subnets
 
   enable_deletion_protection = false
 }
@@ -114,7 +72,7 @@ resource "aws_alb_target_group" "main" {
   name        = "${var.name}-tg-${var.environment}"
   port        = var.load_balancer_port
   protocol    = "HTTP"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {
@@ -229,7 +187,12 @@ resource "aws_ecs_task_definition" "main" {
     { name = "TELEMETRY_INFLUXDB_URL", value = var.influxdb_url },
     { name = "TELEMETRY_INFLUXDB_TOKEN", value = var.influxdb_token }, # TODO: This should go as secret
     { name = "TELEMETRY_INFLUXDB_ORG", value = var.influxdb_org },
-    { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket }
+    { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket },
+    { name = "TELEMETRY_DB_HOST", value = var.database_address },
+    { name = "TELEMETRY_DB_PORT", value = var.database_port },
+    { name = "TELEMETRY_DB_USER", value = var.database_user },
+    { name = "TELEMETRY_DB_PASSWORD", value = var.database_password },
+    { name = "TELEMETRY_DB_NAME", value = var.database_name }
    ]
    logConfiguration = {
      logDriver = "awslogs"
@@ -260,7 +223,7 @@ resource "aws_ecs_service" "main" {
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = module.vpc.private_subnets
+    subnets          = var.private_subnets
     assign_public_ip = false
   }
 
