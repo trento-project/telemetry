@@ -20,15 +20,34 @@ variable "influxdb_bucket" {
   description = "Created Influxdb bucket name. This bucket will have write/read authorizations through an API token"
 }
 
+# Database variables
+
+variable "database_address" {
+  type        = string
+  description = "PostgreSQL database address"
+}
+
+variable "database_port" {
+  type        = string
+  description = "PostgreSQL database port"
+}
+
+variable "database_user" {
+  type        = string
+  description = "PostgreSQL database user name"
+}
+
+variable "database_password" {
+  type        = string
+  description = "PostgreSQL database password"
+}
+
+variable "database_name" {
+  type        = string
+  description = "PostgreSQL database name"
+}
+
 # ECS variables
-
-variable "aws_access_key" {
-  type = string
-}
-
-variable "aws_secret_key" {
-  type = string
-}
 
 variable "region" {
   type        = string
@@ -70,4 +89,19 @@ variable "load_balancer_port" {
   type        = number
   description = "Port where the load balancer is listening"
   default     = 80
+}
+
+variable "vpc_id" {
+  type        = string
+  description = "Used VPC id"
+}
+
+variable "public_subnets" {
+  type        = list
+  description = "List of public subnets in the used VPC"
+}
+
+variable "private_subnets" {
+  type        = list
+  description = "List of private subnets in the used VPC"
 }
