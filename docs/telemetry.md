@@ -37,7 +37,7 @@ Every *Source* is free to define its own telemetry and responsible to implement 
 
 ### **Telemetry Service**
 
-Telemetry Service (aka *Collector Service*, *Telemetry Collector Service*) is an application whose main responsibility is to collect meaninguful **Metrics** being published by different **Sources**.
+Telemetry Service (aka *Collector Service*, *Telemetry Collector Service*) is an application whose main responsibility is to collect meaningful **Data** being published by different **Sources**.
 
 
 and *process* (?) that information in order to make it Consumption-ready.
