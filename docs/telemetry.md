@@ -43,13 +43,8 @@ Telemetry Service (aka *Collector Service*, *Telemetry Collector Service*) is an
 and *process* (?) that information in order to make it Consumption-ready.
 
 ### **Consumption**
-T.B.D.
 
-This is a *deliberatedly-very-generic* placeholder for what comes after collection.
-
-That is the organization consuming collected information as feedbacks for product improvement.
-
-Out of scope atm.
+The consumption of the collected data is out of the scope of this service at the moment, but the core tenet stands that said consumption is only done with the purpose of establishing a closed feedback loop to improve our products.
 
 ### **Basic Flow**
 ![Telemetry Flow](telemetry-flow.png)
