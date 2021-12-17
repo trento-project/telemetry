@@ -18,7 +18,7 @@ Telemetry is used by SUSE to make the products better and is not shared with thi
 ---
 ## **Concepts**
 
-### **Telemetry**
+### **Telemetry Data**
 Anonymous information collected to provide extra feedbacks to the organization for strategic decisions towards improvement.
 
 eg. *number of CPUs*, *SLES version*, *Cloud Provider*
