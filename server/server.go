@@ -108,5 +108,5 @@ func HandleRequests() {
 	http.HandleFunc("/api/collect/hosts", hostTelemetryHandler(influxDBAdapter, postgresAdapter))
 
 	log.Infof("Starting Trento telemetry server...")
-	log.Fatal(http.ListenAndServe(":10000", nil))
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
