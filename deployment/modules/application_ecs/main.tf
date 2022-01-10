@@ -65,7 +65,7 @@ data "aws_route53_zone" "zone" {
 
 resource "aws_route53_record" "record" {
   zone_id = data.aws_route53_zone.zone.zone_id
-  name    = "telemetry"
+  name    = var.name
   type    = "CNAME"
   ttl     = "60"
   records = [aws_lb.main.dns_name]
