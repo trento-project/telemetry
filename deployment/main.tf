@@ -22,6 +22,8 @@ module "telemetry_application" {
   environment        = var.environment
   container_image    = var.container_image
   lb_certificate_arn = var.lb_certificate_arn
+  dns_zone           = var.dns_zone
+  dns_cname          = var.dns_cname
 
   influxdb_url    = var.influxdb_url
   influxdb_token  = var.influxdb_token

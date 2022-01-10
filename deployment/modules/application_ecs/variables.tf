@@ -100,11 +100,9 @@ variable "lb_certificate_arn" {
 variable "dns_zone" {
   type        = string
   description = "The Route 53 DNS zone to add DNS records to"
-  default     = "trento.suse.com"
 }
 
 variable "dns_cname" {
   type        = string
   description = "The name of the CNAME record to add"
-  default     = "telemetry"
 }

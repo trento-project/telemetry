@@ -29,7 +29,7 @@ variable "influxdb_bucket" {
   default     = "trento-telemetry"
 }
 
-# ECS variables
+# AWS variables
 
 variable "name" {
   type        = string
@@ -52,4 +52,16 @@ variable "container_image" {
 variable "lb_certificate_arn" {
   type        = string
   description = "The TLS certificate ARN to use for the TLS termination in ELB"
+}
+
+variable "dns_zone" {
+  type        = string
+  description = "The Route 53 DNS zone to add DNS records to"
+  default     = "trento.suse.com"
+}
+
+variable "dns_cname" {
+  type        = string
+  description = "The name of the CNAME record to add"
+  default     = "telemetry"
 }
