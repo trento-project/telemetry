@@ -4,8 +4,8 @@ influxdb_token = "1234567890abcdef=="
 influxdb_org = "your-org"
 influxdb_bucket = "trento-telemetry"
 
-# ECS deployment data
-name = "trento-telemetry"
-region = "eu-west-2"
-aws_access_key = "1234567890abcdef"
-aws_secret_key = "your-secret"
+# AWS
+lb_certificate_arn = ""
+# name = "trento-telemetry"
+# region = "eu-central-1"
+# environment = "default"
