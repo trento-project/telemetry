@@ -1,3 +1,11 @@
+# AWS provider
+
+variable "region" {
+  type        = string
+  description = "AWS region to use"
+  default     = "eu-central-1"
+}
+
 # Influxdb variables
 
 variable "influxdb_url" {
@@ -23,24 +31,10 @@ variable "influxdb_bucket" {
 
 # ECS variables
 
-variable "aws_access_key" {
-  type = string
-}
-
-variable "aws_secret_key" {
-  type = string
-}
-
-variable "region" {
-  type        = string
-  description = "AWS region to deploy the ECS cluster and resources"
-  default     = "eu-west-2"
-}
-
 variable "name" {
   type        = string
   description = "Given prefix name of the deployed resources"
-  default     = "trento"
+  default     = "trento-telemetry"
 }
 
 variable "environment" {
@@ -52,23 +46,10 @@ variable "environment" {
 variable "container_image" {
   type        = string
   description = "Deployed container name"
-  default     = "ghcr.io/trento-project/telemetry"
+  default     = "ghcr.io/trento-project/telemetry:rolling"
 }
 
-variable "container_tag" {
+variable "lb_certificate_arn" {
   type        = string
-  description = "Deployed container tag"
-  default     = "latest"
-}
-
-variable "container_port" {
-  type        = number
-  description = "Port where the telemetry service is listening within the container"
-  default     = 10000
-}
-
-variable "load_balancer_port" {
-  type        = number
-  description = "Port where the load balancer is listening"
-  default     = 80
+  description = "The TLS certificate ARN to use for the TLS termination in ELB"
 }

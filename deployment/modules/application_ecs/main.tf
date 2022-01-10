@@ -8,8 +8,8 @@ resource "aws_security_group" "alb" {
 
   ingress {
     protocol         = "tcp"
-    from_port        = var.load_balancer_port
-    to_port          = var.load_balancer_port
+    from_port        = 443
+    to_port          = 443
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
@@ -55,6 +55,23 @@ resource "aws_security_group" "ecs_tasks" {
 }
 
 ################################################################################
+# Route 53
+################################################################################
+
+data "aws_route53_zone" "zone" {
+  name         = var.dns_zone
+  private_zone = false
+}
+
+resource "aws_route53_record" "record" {
+  zone_id = data.aws_route53_zone.zone.zone_id
+  name    = "telemetry"
+  type    = "CNAME"
+  ttl     = "60"
+  records = [aws_lb.main.dns_name]
+}
+
+################################################################################
 # Load balancer
 ################################################################################
 
@@ -70,8 +87,8 @@ resource "aws_lb" "main" {
 
 resource "aws_alb_target_group" "main" {
   name        = "${var.name}-tg-${var.environment}"
-  port        = var.load_balancer_port
-  protocol    = "HTTP"
+  port        = 443
+  protocol    = "HTTPS"
   vpc_id      = var.vpc_id
   target_type = "ip"
 
@@ -86,11 +103,11 @@ resource "aws_alb_target_group" "main" {
   }
 }
 
-# TODO: Accept only TLS secured data
 resource "aws_alb_listener" "http" {
     load_balancer_arn = aws_lb.main.id
-    port              = 80
-    protocol          = "HTTP"
+    port              = 443
+    protocol          = "HTTPS"
+    certificate_arn   = var.lb_certificate_arn
 
     default_action {
       target_group_arn = aws_alb_target_group.main.id
@@ -176,7 +193,7 @@ resource "aws_ecs_task_definition" "main" {
 
   container_definitions    = jsonencode([{
    name        = "${var.name}-container-${var.environment}"
-   image       = "${var.container_image}:${var.container_tag}"
+   image       = var.container_image
    essential   = true
    portMappings = [{
      protocol      = "tcp"

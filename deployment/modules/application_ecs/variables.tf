@@ -52,42 +52,26 @@ variable "database_name" {
 variable "region" {
   type        = string
   description = "AWS region to deploy the ECS cluster and resources"
-  default     = "eu-west-2"
 }
 
 variable "name" {
   type        = string
   description = "Given prefix name of the deployed resources"
-  default     = "trento"
 }
 
 variable "environment" {
   type        = string
   description = "Given environment name to group the resources names"
-  default     = "default"
 }
 
 variable "container_image" {
   type        = string
   description = "Deployed container name"
-  default     = "ghcr.io/trento-project/telemetry"
-}
-
-variable "container_tag" {
-  type        = string
-  description = "Deployed container tag"
-  default     = "latest"
 }
 
 variable "container_port" {
   type        = number
   description = "Port where the telemetry service is listening within the container"
-  default     = 10000
-}
-
-variable "load_balancer_port" {
-  type        = number
-  description = "Port where the load balancer is listening"
   default     = 80
 }
 
@@ -104,4 +88,17 @@ variable "public_subnets" {
 variable "private_subnets" {
   type        = list
   description = "List of private subnets in the used VPC"
+}
+
+variable "lb_certificate_arn" {
+  type        = string
+  description = "The TLS certificate ARN to use for the TLS termination in ELB"
+}
+
+# Route 53
+
+variable "dns_zone" {
+  type        = string
+  description = "The Route 53 DNS zone to add DNS records to"
+  default     = "trento.suse.com"
 }
