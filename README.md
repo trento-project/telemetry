@@ -25,12 +25,25 @@ Follow the next steps to deploy the service:
 
 1. Access the `deployment` folder
 2. Create a new `terraform.tfvars` file. Use the [terraform.tfvars.example](deployment/terraform.tfvars.example) as example
-3. Run:
+3. Authorize the AWS connection setting the access key and secret:
+```
+export AWS_ACCESS_KEY_ID="your-key"
+export AWS_SECRET_ACCESS_KEY="your-secret"
+```
+4. Create a S3 bucket to store the terraform state files with the name of `trento-telemetry-backend`
+5. In order to use the production system, change to the `prod` workspace:
+```
+terraform workspace new prod
+# or
+terraform workspace select prod
+```
+Use other workspace like `test` or `myname` to play with other environments. This creates the S3 object in `env/{workspace}/trento-telemetry`
+6. Run:
 ```
 terraform init
 terraform apply
 ```
-4. When the deployment is completed the terraform output shows the `dns_name` which Trento should send the telemetry data
+7. When the deployment is completed the terraform output shows the `url` which Trento should send the telemetry data
 
 ## Development
 
