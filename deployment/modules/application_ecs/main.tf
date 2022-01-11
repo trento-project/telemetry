@@ -8,6 +8,14 @@ resource "aws_security_group" "alb" {
 
   ingress {
     protocol         = "tcp"
+    from_port        = 80
+    to_port          = 80
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    protocol         = "tcp"
     from_port        = 443
     to_port          = 443
     cidr_blocks      = ["0.0.0.0/0"]
@@ -87,8 +95,8 @@ resource "aws_lb" "main" {
 
 resource "aws_alb_target_group" "main" {
   name        = "${var.name}-tg-${var.environment}"
-  port        = 443
-  protocol    = "HTTPS"
+  port        = 80
+  protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
 
@@ -100,6 +108,22 @@ resource "aws_alb_target_group" "main" {
    timeout             = "3"
    path                = "/api/ping"
    unhealthy_threshold = "2"
+  }
+}
+
+resource "aws_alb_listener" "http" {
+  load_balancer_arn = aws_lb.main.id
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+   type = "redirect"
+
+   redirect {
+     port        = 443
+     protocol    = "HTTPS"
+     status_code = "HTTP_301"
+   }
   }
 }
 
