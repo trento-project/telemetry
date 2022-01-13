@@ -40,3 +40,12 @@ module "telemetry_application" {
   database_password = module.database.database_password
   database_name     = module.database.database_name
 }
+
+module "mail_notification" {
+  source      = "./modules/mail_notification"
+
+  name                                = var.name
+  environment                         = var.environment
+  sns_subscription_email_address_list = var.sns_subscription_email_address_list
+  ecs_arn                             = module.telemetry_application.ecs_arn
+}

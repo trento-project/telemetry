@@ -65,3 +65,8 @@ variable "dns_cname" {
   description = "The name of the CNAME record to add"
   default     = "telemetry"
 }
+
+variable "sns_subscription_email_address_list" {
+  type        = list(string)
+  description = "List of email addresses to notify service state changes"
+}

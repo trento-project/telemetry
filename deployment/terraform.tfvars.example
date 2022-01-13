@@ -9,3 +9,4 @@ lb_certificate_arn = ""
 # name = "trento-telemetry"
 # region = "eu-central-1"
 # environment = "default"
+sns_subscription_email_address_list = ["trento@trento.com", "other@trento.com"]
