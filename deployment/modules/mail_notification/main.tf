@@ -48,3 +48,55 @@ resource "aws_cloudwatch_event_target" "sns" {
     input_template = "\"The container <group> in ${var.name}/${var.environment} got <lastStatus> due to <stoppedReason>\""
   }
 }
+
+resource "aws_sns_topic_policy" "allow_emails" {
+  arn    = aws_sns_topic.state_updates.arn
+  policy = data.aws_iam_policy_document.sns_topic_policy.json
+}
+
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "sns_topic_policy" {
+  policy_id = "__default_policy_ID"
+  statement {
+    effect = "Allow"
+    actions = [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:AddPermission",
+      "SNS:RemovePermission",
+      "SNS:DeleteTopic",
+      "SNS:Subscribe",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:Publish",
+    ]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+
+      values = [data.aws_caller_identity.current.account_id]
+    }
+
+    resources = [aws_sns_topic.state_updates.arn]
+    sid = "__default_statement_ID"
+  }
+
+  statement {
+    effect  = "Allow"
+    actions = ["SNS:Publish"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    resources = [aws_sns_topic.state_updates.arn]
+    sid       = "AWSEvents_${var.name}_${var.environment}"
+  }
+}
