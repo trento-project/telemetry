@@ -45,6 +45,14 @@ Follow the next steps to deploy the service:
     ```
 7. When the deployment is completed the terraform output shows the `url` which Trento should send the telemetry data
 
+## Grafana
+
+The AWS deployment with terraform/docker-compose deployment offers a Grafana instance to visualize the collected telemetry metrics.
+
+In order to access the dashboards:
+- docker-compose: Grafana is available in the port 3000
+- AWS: Grafana is available in the port configured by the `grafana_port` variable (3000 by default) in the same telemetry service URL
+
 ## Development
 
 ### Requirements
