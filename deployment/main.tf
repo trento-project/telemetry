@@ -39,7 +39,10 @@ module "telemetry_application" {
   database_user     = module.database.database_user
   database_password = module.database.database_password
   database_name     = module.database.database_name
-}
+
+  grafana_port            = var.grafana_port
+  grafana_container_image = var.grafana_container_image
+}  
 
 module "mail_notification" {
   source      = "./modules/mail_notification"

@@ -29,6 +29,20 @@ variable "influxdb_bucket" {
   default     = "trento-telemetry"
 }
 
+# Grafana
+
+variable "grafana_port" {
+  type        = number
+  description = "Grafana instance public port"
+  default     = 3000
+}
+
+variable "grafana_container_image" {
+  type        = string
+  description = "Deployed container name"
+  default     = "ghcr.io/trento-project/telemetry-grafana:rolling"
+}
+
 # AWS variables
 
 variable "name" {
