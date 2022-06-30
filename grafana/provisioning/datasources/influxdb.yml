@@ -1,0 +1,13 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB_v2_Flux
+    type: influxdb
+    url: $TELEMETRY_INFLUXDB_URL
+    secureJsonData:
+      token: $TELEMETRY_INFLUXDB_TOKEN
+    jsonData:
+      version: Flux
+      organization: $TELEMETRY_INFLUXDB_ORG
+      defaultBucket: $TELEMETRY_INFLUXDB_BUCKET
+      tlsSkipVerify: true
