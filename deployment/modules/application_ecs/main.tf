@@ -22,6 +22,14 @@ resource "aws_security_group" "alb" {
     ipv6_cidr_blocks = ["::/0"]
   }
 
+  ingress {
+    protocol         = "tcp"
+    from_port        = var.grafana_port
+    to_port          = var.grafana_port
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
   egress {
     protocol         = "-1"
     from_port        = 0
@@ -44,6 +52,14 @@ resource "aws_security_group" "ecs_tasks" {
     protocol         = "tcp"
     from_port        = var.container_port
     to_port          = var.container_port
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  ingress {
+    protocol         = "tcp"
+    from_port        = 3000
+    to_port          = 3000
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
@@ -101,13 +117,13 @@ resource "aws_alb_target_group" "main" {
   target_type = "ip"
 
   health_check {
-   healthy_threshold   = "3"
-   interval            = "30"
-   protocol            = "HTTP"
-   matcher             = "200"
-   timeout             = "3"
-   path                = "/api/ping"
-   unhealthy_threshold = "2"
+    healthy_threshold   = "3"
+    interval            = "30"
+    protocol            = "HTTP"
+    matcher             = "200"
+    timeout             = "3"
+    path                = "/api/ping"
+    unhealthy_threshold = "2"
   }
 }
 
@@ -117,26 +133,61 @@ resource "aws_alb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-   type = "redirect"
+    type = "redirect"
 
-   redirect {
-     port        = 443
-     protocol    = "HTTPS"
-     status_code = "HTTP_301"
-   }
+    redirect {
+      port        = 443
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 
 resource "aws_alb_listener" "https" {
-    load_balancer_arn = aws_lb.main.id
-    port              = 443
-    protocol          = "HTTPS"
-    certificate_arn   = var.lb_certificate_arn
+  load_balancer_arn = aws_lb.main.id
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = var.lb_certificate_arn
 
-    default_action {
-      target_group_arn = aws_alb_target_group.main.id
-      type             = "forward"
-    }
+  default_action {
+    target_group_arn = aws_alb_target_group.main.id
+    type             = "forward"
+  }
+}
+
+resource "aws_alb_target_group" "grafana" {
+  name        = "${var.name}-tg-grafana-${var.environment}"
+  port        = var.grafana_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
+
+  health_check {
+    healthy_threshold   = "3"
+    interval            = "30"
+    protocol            = "HTTP"
+    matcher             = "200"
+    timeout             = "3"
+    path                = "/api/health"
+    unhealthy_threshold = "2"
+  }
+
+  stickiness {
+    enabled = true
+    type    = "lb_cookie"
+  }
+}
+
+resource "aws_alb_listener" "grafana_https" {
+  load_balancer_arn = aws_lb.main.id
+  port              = var.grafana_port
+  protocol          = "HTTPS"
+  certificate_arn   = var.lb_certificate_arn
+
+  default_action {
+    target_group_arn = aws_alb_target_group.grafana.id
+    type             = "forward"
+  }
 }
 
 ################################################################################
@@ -147,7 +198,7 @@ resource "aws_ecs_cluster" "main" {
   name = "${var.name}-cluster-${var.environment}"
 
   tags = {
-    Name        = "${var.name}-sg-task-${var.environment}"
+    Name        = "${var.name}-ecs-cluster-${var.environment}"
     Environment = var.environment
   }
 }
@@ -201,13 +252,13 @@ resource "aws_cloudwatch_log_group" "main" {
   name = "/ecs/${var.name}-task-${var.environment}"
 
   tags = {
-    Name        = "${var.name}-task-${var.environment}"
+    Name        = "${var.name}-cloudwatch-${var.environment}"
     Environment = var.environment
   }
 }
 
 resource "aws_ecs_task_definition" "main" {
-  family                   = "${var.name}-task-${var.environment}"
+  family                   = "${var.name}-task-defintion-${var.environment}"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
@@ -215,38 +266,68 @@ resource "aws_ecs_task_definition" "main" {
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
 
-  container_definitions    = jsonencode([{
-   name        = "${var.name}-container-${var.environment}"
-   image       = var.container_image
-   essential   = true
-   portMappings = [{
-     protocol      = "tcp"
-     containerPort = var.container_port
-     hostPort      = var.container_port
-   }]
-   environment: [
-    { name = "TELEMETRY_INFLUXDB_URL", value = var.influxdb_url },
-    { name = "TELEMETRY_INFLUXDB_TOKEN", value = var.influxdb_token }, # TODO: This should go as secret
-    { name = "TELEMETRY_INFLUXDB_ORG", value = var.influxdb_org },
-    { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket },
-    { name = "TELEMETRY_DB_HOST", value = var.database_address },
-    { name = "TELEMETRY_DB_PORT", value = var.database_port },
-    { name = "TELEMETRY_DB_USER", value = var.database_user },
-    { name = "TELEMETRY_DB_PASSWORD", value = var.database_password },
-    { name = "TELEMETRY_DB_NAME", value = var.database_name }
-   ]
-   logConfiguration = {
-     logDriver = "awslogs"
-     options = {
-       awslogs-group         = aws_cloudwatch_log_group.main.name
-       awslogs-stream-prefix = "ecs"
-       awslogs-region        = var.region
-     }
-   }
-  }])
+  container_definitions = jsonencode([
+    {
+      name      = "${var.name}-container-${var.environment}"
+      image     = var.container_image
+      essential = true
+      portMappings = [{
+        protocol      = "tcp"
+        containerPort = var.container_port
+        hostPort      = var.container_port
+      }]
+      environment : [
+        { name = "TELEMETRY_INFLUXDB_URL", value = var.influxdb_url },
+        { name = "TELEMETRY_INFLUXDB_TOKEN", value = var.influxdb_token }, # TODO: This should go as secret
+        { name = "TELEMETRY_INFLUXDB_ORG", value = var.influxdb_org },
+        { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket },
+        { name = "TELEMETRY_DB_HOST", value = var.database_address },
+        { name = "TELEMETRY_DB_PORT", value = var.database_port },
+        { name = "TELEMETRY_DB_USER", value = var.database_user },
+        { name = "TELEMETRY_DB_PASSWORD", value = var.database_password },
+        { name = "TELEMETRY_DB_NAME", value = var.database_name }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.main.name
+          awslogs-stream-prefix = "ecs"
+          awslogs-region        = var.region
+        }
+      }
+    },
+    {
+      name      = "${var.name}-grafana-${var.environment}"
+      image     = var.grafana_container_image
+      essential = true
+      portMappings = [{
+        protocol      = "tcp"
+        containerPort = 3000
+        hostPort      = 3000
+      }]
+      environment : [
+        { name = "TELEMETRY_INFLUXDB_URL", value = var.influxdb_url },
+        { name = "TELEMETRY_INFLUXDB_TOKEN", value = var.influxdb_token }, # TODO: This should go as secret
+        { name = "TELEMETRY_INFLUXDB_ORG", value = var.influxdb_org },
+        { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.main.name
+          awslogs-stream-prefix = "ecs"
+          awslogs-region        = var.region
+        }
+      }
+    }
+  ])
+
+  ephemeral_storage {
+    size_in_gib = 32
+  }
 
   tags = {
-    Name        = "${var.name}-sg-task-${var.environment}"
+    Name        = "${var.name}-task-defintion-${var.environment}"
     Environment = var.environment
   }
 }
@@ -274,7 +355,12 @@ resource "aws_ecs_service" "main" {
     container_port   = var.container_port
   }
 
+  load_balancer {
+    target_group_arn = aws_alb_target_group.grafana.id
+    container_name   = "${var.name}-grafana-${var.environment}"
+    container_port   = "3000"
+  }
   lifecycle {
-   ignore_changes = [task_definition, desired_count]
- }
+    ignore_changes = [task_definition, desired_count]
+  }
 }

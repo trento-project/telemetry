@@ -47,6 +47,18 @@ variable "database_name" {
   description = "PostgreSQL database name"
 }
 
+# Grafana
+
+variable "grafana_port" {
+  type        = number
+  description = "Grafana instance public port"
+}
+
+variable "grafana_container_image" {
+  type        = string
+  description = "Deployed container name"
+}
+
 # ECS variables
 
 variable "region" {

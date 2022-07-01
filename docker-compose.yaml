@@ -39,6 +39,25 @@ services:
         published: 5432
         protocol: tcp
 
+  grafana:
+    build:
+      context: .
+      dockerfile: Dockerfile.Grafana
+    env_file:
+      - .env
+    environment:
+      TELEMETRY_INFLUXDB_URL: ${TELEMETRY_INFLUXDB_URL:-http://influx:8086}
+      TELEMETRY_INFLUXDB_ORG: ${TELEMETRY_INFLUXDB_ORG:-suse}
+      TELEMETRY_INFLUXDB_TOKEN: ${TELEMETRY_INFLUXDB_TOKEN:-telemetry-token}
+      TELEMETRY_INFLUXDB_BUCKET: ${TELEMETRY_INFLUXDB_BUCKET:-telemetry}
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+    volumes:
+      - grafana_data:/var/lib/grafana:rw
+
 volumes:
   influx_data:
   db_data:
+  grafana_data:

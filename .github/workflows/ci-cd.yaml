@@ -74,9 +74,16 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        include:
+          - name: telemetry
+            dockerfile: Dockerfile
+          - name: telemetry-grafana
+            dockerfile: Dockerfile.Grafana
     env:
       REGISTRY: ghcr.io
-      IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/telemetry
+      IMAGE_REPOSITORY: ghcr.io/${{ github.repository_owner }}/${{ matrix.name }}
       IMAGE_TAG: "${{ (github.event_name == 'release' && github.event.release.tag_name) || (github.event_name == 'push' && github.ref_name == 'main' && 'rolling') || github.sha }}"
     steps:
       - uses: actions/checkout@v2
@@ -98,6 +105,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
+          file: ./${{ matrix.dockerfile }}
           push: true
           tags: ${{ env.IMAGE_REPOSITORY }}:${{ env.IMAGE_TAG }}
           labels: ${{ steps.meta.outputs.labels }}

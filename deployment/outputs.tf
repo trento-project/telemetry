@@ -11,5 +11,6 @@ output "database_address" {
 }
 
 output "database_password" {
-  value = module.database.database_password
+  value     = module.database.database_password
+  sensitive = true
 }
