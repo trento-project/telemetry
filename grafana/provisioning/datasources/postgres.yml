@@ -1,0 +1,12 @@
+apiVersion: 1
+
+datasources:
+  - name: PostgresSQL
+    type: postgres
+    url: $TELEMETRY_POSTGRES_HOST:$TELEMETRY_POSTGRES_PORT
+    user: $TELEMETRY_POSTGRES_USER
+    database: $TELEMETRY_POSTGRES_DB
+    jsonData:
+      sslmode: disable
+    secureJsonData:
+      password: $TELEMETRY_POSTGRES_PASSWORD
