@@ -23,7 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1659003017783,
+  "iteration": 1659006213266,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -492,9 +492,9 @@
   "templating": {
     "list": [
       {
-        "allValue": "Community|Premium",
+        "allValue": ".*",
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "All",
           "value": "$__all"
         },

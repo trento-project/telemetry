@@ -23,7 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 2,
-  "iteration": 1659000229296,
+  "iteration": 1659009134905,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -103,7 +103,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT \n  DATE_TRUNC('day', time) as time, count(distinct(payload->'installation_id'))\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' in (${flavor:singlequote})\nGROUP BY DATE_TRUNC ('day', time)\n",
+          "rawSql": "SELECT \n  DATE_TRUNC('day', time) as time, count(distinct(payload->'installation_id'))\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' ~* '${flavor:raw}'\nGROUP BY DATE_TRUNC ('day', time)\n",
           "refId": "A",
           "select": [
             [
@@ -203,7 +203,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT \n  DATE_TRUNC('day', time) as time, count(distinct(payload->'agent_id'))\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' in (${flavor:singlequote})\nGROUP BY DATE_TRUNC ('day', time)\n\n",
+          "rawSql": "SELECT \n  DATE_TRUNC('day', time) as time, count(distinct(payload->'agent_id'))\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor'  ~* '${flavor:raw}'\nGROUP BY DATE_TRUNC ('day', time)\n\n",
           "refId": "A",
           "select": [
             [
@@ -277,7 +277,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  payload->'cloud_provider' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' in (${flavor:singlequote})\nGROUP BY payload->'cloud_provider'",
+          "rawSql": "SELECT\n  payload->'cloud_provider' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor'  ~* '${flavor:raw}'\nGROUP BY payload->'cloud_provider'",
           "refId": "A",
           "select": [
             [
@@ -362,7 +362,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  payload->'sles_version' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' in (${flavor:singlequote})\nGROUP BY payload->'sles_version'",
+          "rawSql": "SELECT\n  payload->'sles_version' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' ~* '${flavor:raw}'\nGROUP BY payload->'sles_version'",
           "refId": "A",
           "select": [
             [
@@ -435,7 +435,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  payload->'total_memory_mb' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' in (${flavor:singlequote})\nGROUP BY payload->'total_memory_mb'\n",
+          "rawSql": "SELECT\n  payload->'total_memory_mb' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' ~* '${flavor:raw}'\nGROUP BY payload->'total_memory_mb'\n",
           "refId": "A",
           "select": [
             [
@@ -508,7 +508,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  payload->'cpu_count' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' in (${flavor:singlequote})\nGROUP BY payload->'cpu_count'\n",
+          "rawSql": "SELECT\n  payload->'cpu_count' AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' ~* '${flavor:raw}'\nGROUP BY payload->'cpu_count'\n",
           "refId": "A",
           "select": [
             [
@@ -540,7 +540,7 @@
   "templating": {
     "list": [
       {
-        "allValue": "'Community','Premium'",
+        "allValue": ".*",
         "current": {
           "selected": true,
           "text": "All",
