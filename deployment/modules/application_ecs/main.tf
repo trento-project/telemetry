@@ -309,7 +309,12 @@ resource "aws_ecs_task_definition" "main" {
         { name = "TELEMETRY_INFLUXDB_URL", value = var.influxdb_url },
         { name = "TELEMETRY_INFLUXDB_TOKEN", value = var.influxdb_token }, # TODO: This should go as secret
         { name = "TELEMETRY_INFLUXDB_ORG", value = var.influxdb_org },
-        { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket }
+        { name = "TELEMETRY_INFLUXDB_BUCKET", value = var.influxdb_bucket },
+        { name = "TELEMETRY_POSTGRES_HOST", value = var.database_address },
+        { name = "TELEMETRY_POSTGRES_PORT", value = var.database_port },
+        { name = "TELEMETRY_POSTGRES_DB", value = var.database_user },
+        { name = "TELEMETRY_POSTGRES_PASSWORD", value = var.database_password },
+        { name = "TELEMETRY_POSTGRES_USER", value = var.database_name }
       ]
       logConfiguration = {
         logDriver = "awslogs"
