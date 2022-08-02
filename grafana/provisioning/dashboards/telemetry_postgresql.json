@@ -23,7 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 2,
-  "iteration": 1659009134905,
+  "iteration": 1659085016340,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -532,6 +532,82 @@
       ],
       "title": "CPU count",
       "type": "piechart"
+    },
+    {
+      "datasource": "PostgresSQL",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 26
+      },
+      "id": 14,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "values": []
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT\n  COALESCE(payload->'agent_installation_source', '\"Unknown\"') AS metric,\n  COUNT(DISTINCT(payload->'agent_id')) AS value\nFROM telemetry\nWHERE\n  $__timeFilter(time) and payload->>'installation_flavor' ~* '${flavor:raw}'\nGROUP BY payload->'agent_installation_source'\n",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "title": "Agent installation source",
+      "transformations": [],
+      "type": "piechart"
     }
   ],
   "schemaVersion": 32,
@@ -585,5 +661,5 @@
   "timezone": "",
   "title": "Trento telemetry (PostgresQL data)",
   "uid": "n9lGce3nz",
-  "version": 5
+  "version": 6
 }
