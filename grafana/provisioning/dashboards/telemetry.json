@@ -23,7 +23,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 1,
-  "iteration": 1659006213266,
+  "iteration": 1659089972941,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -239,7 +239,7 @@
       },
       "targets": [
         {
-          "query": "g_field = \"cloud_provider\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> duplicate(column: \"_value\", as: g_field)\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"\"})\n",
+          "query": "g_field = \"cloud_provider\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"\"})\n",
           "refId": "A"
         }
       ],
@@ -315,7 +315,7 @@
       },
       "targets": [
         {
-          "query": "g_field = \"sles_version\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> duplicate(column: \"_value\", as: g_field)\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"\"})\n",
+          "query": "g_field = \"sles_version\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"\"})\n",
           "refId": "A"
         }
       ],
@@ -392,7 +392,7 @@
       },
       "targets": [
         {
-          "query": "g_field = \"total_memory_mb\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> duplicate(column: \"_value\", as: g_field)\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"Total memory MB\"})",
+          "query": "g_field = \"total_memory_mb\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"Total memory MB\"})",
           "refId": "A"
         }
       ],
@@ -468,7 +468,7 @@
       },
       "targets": [
         {
-          "query": "g_field = \"cpu_count\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> duplicate(column: \"_value\", as: g_field)\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"CPU count\"})",
+          "query": "g_field = \"cpu_count\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /${flavor:raw}/)\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"CPU count\"})",
           "refId": "A"
         }
       ],
@@ -482,6 +482,57 @@
           }
         }
       ],
+      "type": "piechart"
+    },
+    {
+      "datasource": "InfluxDB_v2_Flux",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 25
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "query": "g_field = \"agent_installation_source\"\nfrom(bucket: \"telemetry\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"host_telemetry\")\n  |> filter(fn: (r) => r[\"_field\"] == \"installation_flavor\" or r[\"_field\"] == g_field)\n  |> pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |> filter(fn: (r) => r.installation_flavor =~ /.*/)\n  |> map(fn: (r) => ({ r with \n      agent_installation_source: if exists r.agent_installation_source then\n        r.agent_installation_source\n      else\n        \"Unknown\"\n    }),\n  )\n  |> duplicate(column: g_field, as: \"_value\")\n  |> last()\n  |> group(columns: [g_field])\n  |> count()\n  |> rename(columns: {_value: \"\"})",
+          "refId": "A"
+        }
+      ],
+      "title": "Agent installation source",
       "type": "piechart"
     }
   ],
@@ -537,5 +588,5 @@
   "timezone": "",
   "title": "Trento telemetry",
   "uid": "cZ4tTs3nk",
-  "version": 3
+  "version": 4
 }
