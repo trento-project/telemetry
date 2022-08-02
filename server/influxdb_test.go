@@ -68,26 +68,28 @@ func cleanUpInfluxDB(client influxdb2.Client, org string, bucket string) {
 func (suite *InfluxDBTestSuite) TestStoreHostTelemetry() {
 	err := suite.influxDBAdapter.StoreHostTelemetry([]*HostTelemetry{
 		{
-			InstallationID:     "uuid1",
-			InstallationFlavor: "Community",
-			AgentID:            "agent_id",
-			SLESVersion:        "15.2",
-			CPUCount:           16,
-			SocketCount:        32,
-			TotalMemoryMB:      32000,
-			CloudProvider:      "azure",
-			Time:               time.Now(),
+			InstallationID:          "uuid1",
+			InstallationFlavor:      "Community",
+			AgentID:                 "agent_id",
+			SLESVersion:             "15.2",
+			CPUCount:                16,
+			SocketCount:             32,
+			TotalMemoryMB:           32000,
+			CloudProvider:           "azure",
+			AgentInstallationSource: "Community",
+			Time:                    time.Now(),
 		},
 		{
-			InstallationID:     "uuid2",
-			InstallationFlavor: "Premium",
-			AgentID:            "agent_id_2",
-			SLESVersion:        "15.2",
-			CPUCount:           16,
-			SocketCount:        16,
-			TotalMemoryMB:      16000,
-			CloudProvider:      "aws",
-			Time:               time.Now(),
+			InstallationID:          "uuid2",
+			InstallationFlavor:      "Premium",
+			AgentID:                 "agent_id_2",
+			SLESVersion:             "15.2",
+			CPUCount:                16,
+			SocketCount:             16,
+			TotalMemoryMB:           16000,
+			CloudProvider:           "aws",
+			AgentInstallationSource: "Premium",
+			Time:                    time.Now(),
 		},
 	})
 	suite.NoError(err)
@@ -106,7 +108,7 @@ func (suite *InfluxDBTestSuite) TestStoreHostTelemetry() {
 				columnKey: ["_field"],
 				valueColumn: "_value"
 			)
-			|> keep(columns: ["agent_id", "installation_id", "installation_flavor", "cloud_provider", "cpu_count", "sles_version", "socket_count", "total_memory_mb"])`,
+			|> keep(columns: ["agent_id", "agent_installation_source", "installation_id", "installation_flavor", "cloud_provider", "cpu_count", "sles_version", "socket_count", "total_memory_mb"])`,
 		&domain.Dialect{
 			Annotations: nil,
 			Delimiter:   &delimiter,
@@ -115,5 +117,5 @@ func (suite *InfluxDBTestSuite) TestStoreHostTelemetry() {
 	)
 
 	suite.NoError(err)
-	suite.Equal(",_result,0,agent_id_2,uuid2,aws,16,Premium,15.2,16,16000", strings.TrimSpace(result))
+	suite.Equal(",_result,0,agent_id_2,uuid2,Premium,aws,16,Premium,15.2,16,16000", strings.TrimSpace(result))
 }
