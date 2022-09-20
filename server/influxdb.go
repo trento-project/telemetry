@@ -36,6 +36,7 @@ func (i *InfluxDB) StoreHostTelemetry(h []*HostTelemetry) error {
 			AddField("socket_count", t.SocketCount).
 			AddField("total_memory_mb", t.TotalMemoryMB).
 			AddField("cloud_provider", t.CloudProvider).
+			AddField("agent_installation_source", t.AgentInstallationSource).
 			SetTime(t.Time)
 
 		err := writeAPI.WritePoint(context.Background(), p)
